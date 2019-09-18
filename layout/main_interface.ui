@@ -17,17 +17,28 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QVBoxLayout" name="layout">
-      <item alignment="Qt::AlignTop">
-       <widget class="QPushButton" name="browse_button">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Load Dataset</string>
-        </property>
-       </widget>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="browse_button">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Load Dataset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="k_val_selector">
+          <property name="value">
+           <number>3</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">

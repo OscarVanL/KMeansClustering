@@ -9,9 +9,10 @@ class KMeans:
     dataset: pd.Series
     vectors: [tuple]
     dimensions: int  # Number of dimensions to K-Means Vectors
-    k: int
+    k: int = 3
     centroids = []
     clusters = [[]]
+    data_displayed = False
 
 
 
@@ -26,12 +27,11 @@ class KMeans:
         self.vectors = list(map(lambda x: tuple(x), self.dataset.values))
         print("Dimensions: {}".format(self.dimensions))
 
-        self.k = 7
-        self.init_centroids()
-
-
 
     def cluster_points(self):
+        if not self.centroids:
+            self.init_centroids()
+
         # Initialise K clusters
         clusters = [[] for i in range(self.k)]
 
@@ -57,6 +57,7 @@ class KMeans:
 
     # Pick random starting positions for Centroids
     def init_centroids(self):
+        print("Initialising {} Centroids".format(self.k))
         for _ in range(self.k):
             random_point = random.choice(self.vectors)
             self.centroids.append(random_point)
@@ -81,9 +82,19 @@ class KMeans:
 
         return tuple(mean_vector)
 
+    def update_k(self, k: int):
+        if self.k != k:
+            self.k = k
+            if self.data_displayed:
+                self.centroids = []
+                self.clusters = [[]]
+                self.init_centroids()
+                self.cluster_points()
+
     loop_pos = 0
 
     def next_step(self):
+        self.data_displayed = True
         if self.loop_pos == 0:
             self.cluster_points()
         elif self.loop_pos == 1:
