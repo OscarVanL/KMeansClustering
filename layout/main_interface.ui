@@ -32,11 +32,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="k_val_selector">
-          <property name="value">
-           <number>3</number>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>K-Value</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="k_val_selector">
+            <property name="value">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -62,6 +73,13 @@
        <widget class="QPushButton" name="step_button">
         <property name="text">
          <string>Next</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="elbow_chart_button">
+        <property name="text">
+         <string>Show Elbow Chart</string>
         </property>
        </widget>
       </item>

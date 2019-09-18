@@ -2,6 +2,7 @@ import random
 
 import sys
 import pandas as pd
+import numpy as np
 from scipy.spatial import distance
 
 class KMeans:
@@ -13,11 +14,6 @@ class KMeans:
     centroids = []
     clusters = [[]]
     data_displayed = False
-
-
-
-    def __init__(self, dimensions: int):
-        self.dimensions = dimensions
 
     def open_dataset(self, filepath: str):
         self.filepath = filepath
@@ -52,9 +48,6 @@ class KMeans:
         # Update the centroid positions
         self.update_centroid_pos()
 
-
-
-
     # Pick random starting positions for Centroids
     def init_centroids(self):
         print("Initialising {} Centroids".format(self.k))
@@ -63,16 +56,23 @@ class KMeans:
             self.centroids.append(random_point)
             print("Init Centroid:", random_point)
 
-
-
-
     # Updates the Centroid for each cluster as the mean of points within the cluster
     def update_centroid_pos(self):
         for i in range(len(self.centroids)):
             self.centroids[i] = self.mean_vector(self.clusters[i])
 
+    # Calculates Sum of Squared Errors (SSE)
+    def calculate_sse(self):
+        sse = 0
+        for cluster in self.clusters:
+            mean = self.mean_vector(cluster)
+            for point in cluster:
+                sse += np.linalg.norm(np.subtract(point, mean)) ** 2
+                print(sse)
+
     # Mean of set of vectors (representing a cluster), new Centroid position for that cluster
-    def mean_vector(self, s: [tuple]):
+    @staticmethod
+    def mean_vector(s: [tuple]):
         dimensions = len(s[0])
         mean_vector = []
         # For each dimension of the vector

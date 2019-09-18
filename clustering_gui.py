@@ -1,7 +1,4 @@
-import random
-
 from k_means import KMeans
-import numpy as np
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -12,6 +9,7 @@ import os
 import sys
 
 main_interface_file = os.path.join('layout', 'main_interface.ui')  # OS-safe path slashes
+
 
 class ClusteringGui(QMainWindow):
     layout: QVBoxLayout  # Main Layout in which everything else is contained
@@ -26,7 +24,7 @@ class ClusteringGui(QMainWindow):
     figure: plt.Figure
 
     def __init__(self):
-        self.kmeans = KMeans(dimensions=2)
+        self.kmeans = KMeans()
         super(ClusteringGui, self).__init__()
         uic.loadUi(main_interface_file, self)
 
@@ -36,6 +34,8 @@ class ClusteringGui(QMainWindow):
         self.k_selector.valueChanged.connect(self.on_update_k)
         self.step_btn = self.findChild(QPushButton, 'step_button')
         self.step_btn.clicked.connect(self.on_step_click)
+        self.elbow_btn = self.findChild(QPushButton, 'elbow_chart_button')
+        self.elbow_btn.clicked.connect(self.on_show_elbow)
         self.layout = self.findChild(QVBoxLayout, 'layout')
         self.dimensions_label = self.findChild(QLabel, 'dimensions_label')
 
@@ -54,7 +54,6 @@ class ClusteringGui(QMainWindow):
             error_dialog.showMessage("File Not Found, try again")
             error_dialog.exec()
 
-
     # Handles K value being changed
     @pyqtSlot()
     def on_update_k(self):
@@ -63,12 +62,17 @@ class ClusteringGui(QMainWindow):
         if self.kmeans.data_displayed:
             self.update_matplotlib()
 
+    # Handles 'Next' button being pressed
     @pyqtSlot()
     def on_step_click(self):
         self.kmeans.next_step()
         self.update_matplotlib()
 
+    @pyqtSlot()
+    def on_show_elbow(self):
+        print(self.kmeans.calculate_sse())
 
+    # Adds the matplotlib canvas to the UI
     def add_matplotlib_canvas(self):
         try:
             self.figure.clear()
@@ -77,7 +81,7 @@ class ClusteringGui(QMainWindow):
             self.plot_canvas = FigureCanvas(self.figure)
             self.layout.addWidget(self.plot_canvas)
 
-        ax = self.figure.add_subplot(111)
+        ax = self.figure.add_subplot(1, 1, 1)
 
         x = [point[0] for point in self.kmeans.vectors]
         y = [point[1] for point in self.kmeans.vectors]
@@ -85,15 +89,16 @@ class ClusteringGui(QMainWindow):
 
         self.plot_canvas.draw()
 
+    # Updates the matplotlib UI
     def update_matplotlib(self):
         self.figure.clear()
 
-        ax = self.figure.add_subplot(111)
+        ax = self.figure.add_subplot(1, 1, 1)
 
         for cluster in self.kmeans.clusters:
             x = [point[0] for point in cluster]
             y = [point[1] for point in cluster]
-            ax.scatter(x, y, alpha=0.8)
+            ax.scatter(x, y, alpha=0.5)
 
         for centroid in self.kmeans.centroids:
             x, y = centroid[0], centroid[1]
@@ -102,16 +107,16 @@ class ClusteringGui(QMainWindow):
         self.plot_canvas.draw()
 
 
-
-
 def main():
     app = QApplication(sys.argv)
     window = ClusteringGui()
     window.show()
     app.exec_()
 
+
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
+
 
 sys.excepthook = except_hook
 main()
