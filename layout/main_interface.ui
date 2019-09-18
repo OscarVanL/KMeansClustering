@@ -30,7 +30,14 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="elbow_sse_label">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QLabel" name="dimensions_label">
           <property name="text">
@@ -38,14 +45,14 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="elbow_sse_k">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="step_button">
+        <property name="text">
+         <string>Next</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

@@ -16,6 +16,7 @@ main_interface_file = os.path.join('layout', 'main_interface.ui')  # OS-safe pat
 class ClusteringGui(QMainWindow):
     layout: QVBoxLayout  # Main Layout in which everything else is contained
     browse_btn: QPushButton  # Load Dataset button
+    step_btn: QPushButton  # Next button
     dimensions_label: QLabel  # Filled with vector dimensions found from dataset
     recommended_k_label: QLabel  # Filled with recommended K value as calculated using SSE / Elbow method
     plot_canvas: FigureCanvas  # Canvas containing matplotlib plot
@@ -30,6 +31,8 @@ class ClusteringGui(QMainWindow):
 
         self.browse_btn = self.findChild(QPushButton, 'browse_button')
         self.browse_btn.clicked.connect(self.on_browse_click)
+        self.step_btn = self.findChild(QPushButton, 'step_button')
+        self.step_btn.clicked.connect(self.on_step_click)
         self.layout = self.findChild(QVBoxLayout, 'layout')
         self.dimensions_label = self.findChild(QLabel, 'dimensions_label')
 
@@ -49,15 +52,37 @@ class ClusteringGui(QMainWindow):
 
         self.add_matplotlib_canvas()
 
+    @pyqtSlot()
+    def on_step_click(self):
+        self.kmeans.next_step()
+        self.update_matplotlib()
+
+
     def add_matplotlib_canvas(self):
         self.figure = plt.figure()
         self.plot_canvas = FigureCanvas(self.figure)
         self.layout.addWidget(self.plot_canvas)
 
-        data = [random.random() for i in range(10)]
         self.figure.clear()
+
         ax = self.figure.add_subplot(111)
-        ax.plot(data, '*-')
+
+        x = [point[0] for point in self.kmeans.vectors]
+        y = [point[1] for point in self.kmeans.vectors]
+        ax.scatter(x, y, alpha=0.8)
+
+        self.plot_canvas.draw()
+
+    def update_matplotlib(self):
+        self.figure.clear()
+
+        ax = self.figure.add_subplot(111)
+
+        for cluster in self.kmeans.clusters:
+            x = [point[0] for point in cluster]
+            y = [point[1] for point in cluster]
+            ax.scatter(x, y, alpha=0.8)
+
         self.plot_canvas.draw()
 
 
