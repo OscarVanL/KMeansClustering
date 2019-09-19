@@ -66,11 +66,9 @@ class KMeans:
 
     # Pick random starting positions for Centroids
     def init_centroids(self):
-        print("Initialising {} Centroids".format(self.k))
         for _ in range(self.k):
             random_point = random.choice(self.vectors)
             self.centroids.append(random_point)
-            print("Init Centroid:", random_point)
 
     # Updates the Centroid for each cluster as the mean of points within the cluster
     def update_centroid_pos(self):
@@ -90,14 +88,18 @@ class KMeans:
     # Mean of set of vectors (representing a cluster), new Centroid position for that cluster
     @staticmethod
     def mean_vector(s: [tuple]):
-        dimensions = len(s[0])
-        mean_vector = []
-        # For each dimension of the vector
-        for dimension in range(dimensions):
-            axis_mean = sum([i[dimension] for i in s]) / len(s)
-            mean_vector.append(axis_mean)
+        try:
+            dimensions = len(s[0])
+            mean_vector = []
+            # For each dimension of the vector
+            for dimension in range(dimensions):
+                axis_mean = sum([i[dimension] for i in s]) / len(s)
+                mean_vector.append(axis_mean)
 
-        return tuple(mean_vector)
+            return tuple(mean_vector)
+        except IndexError:
+            return None
+
 
     def update_k(self, k: int):
         if self.k != k:

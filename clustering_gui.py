@@ -23,8 +23,10 @@ class ClusteringGui(QMainWindow):
     recommended_k_label: QLabel  # Filled with recommended K value as calculated using SSE / Elbow method
     plot_canvas: FigureCanvas  # Canvas containing matplotlib plot
 
+    path: str  # Path of current loaded dataset
     kmeans: KMeans
     figure: plt.Figure
+    elbow_chart: QWidget
 
     def __init__(self):
         self.kmeans = KMeans()
@@ -39,23 +41,30 @@ class ClusteringGui(QMainWindow):
         self.repetitions_selector.valueChanged.connect(self.on_set_repetitions)
         self.run_btn = self.findChild(QPushButton, 'run_button')
         self.run_btn.clicked.connect(self.on_run_click)
+        self.run_btn.setEnabled(False)
         self.step_btn = self.findChild(QPushButton, 'step_button')
         self.step_btn.clicked.connect(self.on_step_click)
+        self.step_btn.setEnabled(False)
         self.elbow_btn = self.findChild(QPushButton, 'elbow_chart_button')
         self.elbow_btn.clicked.connect(self.on_show_elbow)
+        self.elbow_btn.setEnabled(False)
         self.layout = self.findChild(QVBoxLayout, 'layout')
         self.dimensions_label = self.findChild(QLabel, 'dimensions_label')
+        self.dimensions_label.setText("")
 
         self.show()
 
     @pyqtSlot()
     def on_browse_click(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open Dataset", "", "CSV Files (*.csv)")
+        self.path, _ = QFileDialog.getOpenFileName(self, "Open Dataset", "", "CSV Files (*.csv)")
         try:
-            self.kmeans.open_dataset(filepath=path)
+            self.kmeans.open_dataset(filepath=self.path)
             self.dimensions_label.setText("Dimensions: {}".format(self.kmeans.dimensions))
             self.add_matplotlib_canvas()
-            self.setWindowTitle('K-Means Clustering: {}'.format(path))
+            self.setWindowTitle('K-Means Clustering: {}'.format(self.path))
+            self.elbow_btn.setEnabled(True)
+            self.run_btn.setEnabled(True)
+            self.step_btn.setEnabled(True)
         except FileNotFoundError:
             print("Exception")
             error_dialog = QErrorMessage()
@@ -67,7 +76,7 @@ class ClusteringGui(QMainWindow):
         sse = []
         # Calculate SSE for values of K ranging from 1 to 10.
         for i in range(1,10):
-            print("Calculating for K =", i)
+            print("Calculating SSE for K =", i)
             self.kmeans.update_k(i)
             # Cluster and update centroids 3 times for each K value
             self.kmeans.cluster_points()
@@ -76,7 +85,7 @@ class ClusteringGui(QMainWindow):
             sse.append(self.kmeans.calculate_sse())
 
         self.elbow_chart = ElbowChartGui()
-        self.elbow_chart.plot(sse)
+        self.elbow_chart.plot(sse, self.path)
 
     # Handles K value being changed
     @pyqtSlot()
@@ -147,11 +156,13 @@ class ElbowChartGui(QWidget):
         self.layout.addWidget(self.plot_canvas)
         self.setLayout(self.layout)
 
-    def plot(self, sse: [int]):
+    def plot(self, sse: [int], filepath: str):
         ax = self.figure.add_subplot(1, 1, 1)
         ax.plot([1,2,3,4,5,6,7,8,9], sse)
         self.plot_canvas.draw()
         self.show()
+        self.activateWindow()
+        self.setWindowTitle("Elbow Chart: {}".format(filepath))
         print(sse)
 
 
@@ -160,6 +171,7 @@ def main():
     app = QApplication(sys.argv)
     window = ClusteringGui()
     window.show()
+    window.activateWindow()
     app.exec_()
 
 
